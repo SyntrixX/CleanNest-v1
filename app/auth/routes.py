@@ -48,13 +48,15 @@ def register_professional():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
+        service_category = request.form.get('service_category')
+        experience = request.form.get('experience')
         
         user = User(email=email, role='professional')
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
         
-        professional = Professional(user_id=user.id, name=name)
+        professional = Professional(user_id=user.id, name=name, service_category=service_category, experience=experience)
         db.session.add(professional)
         db.session.commit()
         

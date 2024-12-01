@@ -11,7 +11,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('home') }}">CleanNest</a>
+            <a class="navbar-brand" href="{% if current_user.role == 'admin' %}{{ url_for('admin.home') }}{% elif current_user.role == 'professional' %}{{ url_for('professional.home') }}{% else %}{{ url_for('customer.home') }}{% endif %}">CleanNest</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -54,7 +54,7 @@
                 <ul class="navbar-nav">
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">Logout</a>
                         </li>
                     {% else %}
                         <li class="nav-item">

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Browse Services - Household Services{% endblock %}
+{% block title %}Browse Services - CleanNest{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
@@ -60,7 +60,9 @@
                     <h5 class="modal-title">Request {{ service.name }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ url_for('customer.request_service', service_id=service.id) }}" method="POST">
+                <form action="{{ url_for('customer.submit_request') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="service_id" value="{{ service.id }}">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Preferred Date</label>

@@ -8,12 +8,12 @@
         <div class="card">
             <div class="card-body text-center">
                 <div class="mb-3">
-                    <img src="{{ customer.profile_image or url_for('static', filename='images/default-profile.png') }}" 
+                    <img src="{{ current_user.customer.profile_image or url_for('static', filename='images/default-profile.png') }}" 
                          alt="Profile Picture" 
                          class="rounded-circle img-thumbnail" 
                          style="width: 150px; height: 150px; object-fit: cover;">
                 </div>
-                <h4 class="card-title mb-1">{{ customer.name }}</h4>
+                <h4 class="card-title mb-1">{{ current_user.customer.name }}</h4>
             </div>
         </div>
 
@@ -23,15 +23,15 @@
                 <ul class="list-unstyled">
                     <li class="mb-2">
                         <i class="bi bi-envelope me-2"></i>
-                        {{ customer.user.email }}
+                        {{ current_user.email }}
                     </li>
                     <li class="mb-2">
                         <i class="bi bi-phone me-2"></i>
-                        {{ customer.phone }}
+                        {{ current_user.customer.phone }}
                     </li>
                     <li class="mb-2">
                         <i class="bi bi-geo-alt me-2"></i>
-                        {{ customer.address }}
+                        {{ current_user.customer.address }}
                     </li>
                     <li>
                         <i class="bi bi-clock-history me-2"></i>

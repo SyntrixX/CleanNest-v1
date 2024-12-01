@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Professional Dashboard - Household Services{% endblock %}
+{% block title %}Professional Dashboard - CleanNest{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
@@ -92,7 +92,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('professional.request_detail', request_id=request.id) }}" 
+                                    <a href="{{ url_for('professional.requests', request_id=request.id) }}" 
                                        class="btn btn-sm btn-outline-primary">
                                         View Details
                                     </a>
@@ -112,15 +112,16 @@
                 <h5 class="mb-0">Performance Overview</h5>
             </div>
             <div class="card-body">
+                {% if professional %}
                 <div class="mb-4">
                     <h6 class="mb-2">Overall Rating</h6>
                     <div class="d-flex align-items-center">
-                        <div class="display-4 me-2">{{ "%.1f"|format(rating_avg) }}</div>
+                        <div class="display-4 me-2">{{ "%.1f"|format(professional.rating) }}</div>
                         <div class="text-warning">
-                            {% for _ in range(rating_avg|int) %}
+                            {% for _ in range(professional.rating|int) %}
                             <i class="bi bi-star-fill"></i>
                             {% endfor %}
-                            {% if rating_avg % 1 >= 0.5 %}
+                            {% if professional.rating % 1 >= 0.5 %}
                             <i class="bi bi-star-half"></i>
                             {% endif %}
                         </div>
@@ -139,6 +140,9 @@
                     </div>
                     <small class="text-muted">Last 30 days</small>
                 </div>
+                {% else %}
+                <p class="text-muted">No performance data available.</p>
+                {% endif %}
             </div>
         </div>
     </div>

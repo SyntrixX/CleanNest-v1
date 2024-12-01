@@ -7,6 +7,7 @@
     <div class="col-md-4 mb-4">
         <div class="card">
             <div class="card-body text-center">
+                {% if professional %}
                 <div class="mb-3">
                     <img src="{{ professional.profile_image or url_for('static', filename='images/default-profile.png') }}" 
                          alt="Profile Picture" 
@@ -24,12 +25,17 @@
                     {% endif %}
                 </div>
                 <p class="mb-0">{{ professional.experience }} years experience</p>
+                <p class="mb-0">Average Rating: {{ professional.rating_avg }}</p>
+                {% else %}
+                <p class="text-muted">No profile data available.</p>
+                {% endif %}
             </div>
         </div>
 
         <div class="card mt-4">
             <div class="card-body">
                 <h5 class="card-title">Contact Information</h5>
+                {% if professional %}
                 <ul class="list-unstyled">
                     <li class="mb-2">
                         <i class="bi bi-envelope me-2"></i>
@@ -44,6 +50,9 @@
                         {{ professional.location or 'Not provided' }}
                     </li>
                 </ul>
+                {% else %}
+                <p class="text-muted">No contact information available.</p>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -54,7 +63,8 @@
                 <h5 class="mb-0">Edit Profile</h5>
             </div>
             <div class="card-body">
-                <form action="{{ url_for('professional.update_profile') }}" method="POST" enctype="multipart/form-data">
+                {% if professional %}
+                <form action="{{ url_for('professional.profile') }}" method="POST" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Full Name</label>
@@ -101,6 +111,9 @@
 
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </form>
+                {% else %}
+                <p class="text-muted">No profile data available to edit.</p>
+                {% endif %}
             </div>
         </div>
 

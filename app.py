@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from app.auth.routes import bp as auth_bp
 from app.professional.routes import bp as professional_bp
 from app.admin.routes import bp as admin_bp
@@ -18,7 +18,7 @@ def create_app():
     
     @app.route('/')
     def home():
-        return 'Hello, World!'
+        return render_template('home.html')
     
     # Custom error handlers
     @app.errorhandler(404)
