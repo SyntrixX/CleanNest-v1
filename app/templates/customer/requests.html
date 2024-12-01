@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}My Requests - Household Services{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>My Service Requests</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('customer.requests', status='pending') }}" 
+           class="btn btn-outline-primary {{ 'active' if status == 'pending' }}">Pending</a>
+        <a href="{{ url_for('customer.requests', status='active') }}" 
+           class="btn btn-outline-primary {{ 'active' if status == 'active' }}">Active</a>
+        <a href="{{ url_for('customer.requests', status='completed') }}" 
+           class="btn btn-outline-primary {{ 'active' if status == 'completed' }}">Completed</a>
+    </div>
+</div>
+
+<div class="row">
+    {% for request in requests %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="card-title mb-1">{{ request.service.name }}</h5>
+                        <span class="badge bg-{{ request.status|status_color }}">{{ request.status|title }}</span>
+                    </div>
+                    <div class="text-end">
+                        <p class="text-muted mb-1">Request #{{ request.id }}</p>
+                        <small class="text-muted">{{ request.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    </div>
+                </div>
+
+                {% if request.professional %}
+                <div class="mb-3">
+                    <h6>Professional Details</h6>
+                    <p class="mb-1"><i class="bi bi-person"></i> {{ request.professional.name }}</p>
+                    <p class="mb-1">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        {{ "%.1f"|format(request.professional.rating) }} rating
+                    </p>
+                    <p class="mb-0"><i class="bi bi-telephone"></i> {{ request.professional.phone }}</p>
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <h6>Service Details</h6>
+                    <p class="mb-1">
+                        <i class="bi bi-calendar"></i>
+                        Preferred: {{ request.preferred_date.strftime('%Y-%m-%d') }}
+                        ({{ request.preferred_time|title }})
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-currency-dollar"></i>
+                        Price: ${{ "%.2f"|format(request.service.price) }}
+                    </p>
+                </div>
+
+                {% if request.status == 'completed' and not request.rating %}
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6>Leave Feedback</h6>
+                        <form action="{{ url_for('customer.submit_feedback', request_id=request.id) }}" method="POST">
+                            <div class="mb-3">
+                                <label class="form-label">Rating</label>
+                                <div class="rating">
+                                    {% for i in range(5, 0, -1) %}
+                                    <input type="radio" name="rating" value="{{ i }}" id="star{{ i }}" required>
+                                    <label for="star{{ i }}"><i class="bi bi-star-fill"></i></label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Feedback</label>
+                                <textarea class="form-control" name="feedback" rows="2" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        </form>
+                    </div>
+                </div>
+                {% elif request.rating %}
+                <div>
+                    <h6>Your Feedback</h6>
+                    <div class="text-warning mb-1">
+                        {% for _ in range(request.rating) %}
+                        <i class="bi bi-star-fill"></i>
+                        {% endfor %}
+                    </div>
+                    {% if request.feedback %}
+                    <p class="mb-0"><em>"{{ request.feedback }}"</em></p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not requests %}
+<div class="text-center py-5">
+    <i class="bi bi-inbox fs-1 text-muted"></i>
+    <p class="mt-2">No {{ status }} requests found</p>
+    <a href="{{ url_for('customer.services') }}" class="btn btn-primary mt-2">Browse Services</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block styles %}
+<style>
+.rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+.rating input {
+    display: none;
+}
+.rating label {
+    cursor: pointer;
+    padding: 5px;
+    color: #ddd;
+}
+.rating input:checked ~ label {
+    color: #ffc107;
+}
+.rating label:hover,
+.rating label:hover ~ label {
+    color: #ffc107;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Dashboard - CleanNest{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2>Welcome, {{ current_user.customer.name }}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Active Requests</h5>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <h3 class="mb-0">{{ active_requests|length }}</h3>
+                        <p class="text-muted mb-0">In Progress</p>
+                    </div>
+                    <i class="bi bi-gear-fill fs-1 text-primary"></i>
+                </div>
+                <a href="{{ url_for('customer.requests', status='active') }}" 
+                   class="btn btn-outline-primary mt-3">View Active</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Completed Services</h5>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <h3 class="mb-0">{{ completed_requests|length }}</h3>
+                        <p class="text-muted mb-0">Total Completed</p>
+                    </div>
+                    <i class="bi bi-check-circle fs-1 text-success"></i>
+                </div>
+                <a href="{{ url_for('customer.requests', status='completed') }}" 
+                   class="btn btn-outline-success mt-3">View History</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Browse Services</h5>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <h3 class="mb-0">{{ total_services }}</h3>
+                        <p class="text-muted mb-0">Available Services</p>
+                    </div>
+                    <i class="bi bi-search fs-1 text-info"></i>
+                </div>
+                <a href="{{ url_for('customer.services') }}" 
+                   class="btn btn-outline-info mt-3">Browse Services</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Service Requests</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Professional</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in recent_requests %}
+                            <tr>
+                                <td>{{ request.service.name }}</td>
+                                <td>{{ request.professional.name if request.professional else 'Pending' }}</td>
+                                <td>{{ request.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ request.status|status_color }}">
+                                        {{ request.status|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('customer.request_detail', request_id=request.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('customer.services') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-lg"></i> New Service Request
+                    </a>
+                    <a href="{{ url_for('customer.update_profile') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-person"></i> Update Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

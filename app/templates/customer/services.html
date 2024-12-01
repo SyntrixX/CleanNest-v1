@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Services - Household Services{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Available Services</h2>
+            <div class="d-flex gap-2">
+                <div class="input-group" style="width: 300px;">
+                    <input type="text" class="form-control" id="searchService" 
+                           placeholder="Search services...">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+                <select class="form-select" id="categoryFilter" style="width: auto;">
+                    <option value="">All Categories</option>
+                    <option value="cleaning">Cleaning</option>
+                    <option value="plumbing">Plumbing</option>
+                    <option value="electrical">Electrical</option>
+                    <option value="carpentry">Carpentry</option>
+                    <option value="painting">Painting</option>
+                    <option value="gardening">Gardening</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" id="servicesGrid">
+    {% for service in services %}
+    <div class="col-md-4 mb-4" data-category="{{ service.category }}">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ service.name }}</h5>
+                <span class="badge bg-primary mb-2">{{ service.category|title }}</span>
+                <p class="card-text">{{ service.description }}</p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-primary fw-bold">${{ "%.2f"|format(service.price) }}</span>
+                    <span class="text-muted">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        {{ "%.1f"|format(service.rating|default(0)) }}
+                    </span>
+                </div>
+                <button class="btn btn-primary w-100" data-bs-toggle="modal" 
+                        data-bs-target="#requestService{{ service.id }}">
+                    Request Service
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Service Modal -->
+    <div class="modal fade" id="requestService{{ service.id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Request {{ service.name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('customer.request_service', service_id=service.id) }}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Preferred Date</label>
+                            <input type="date" class="form-control" name="preferred_date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Preferred Time</label>
+                            <select class="form-select" name="preferred_time" required>
+                                <option value="morning">Morning (8 AM - 12 PM)</option>
+                                <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
+                                <option value="evening">Evening (4 PM - 8 PM)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Additional Notes</label>
+                            <textarea class="form-control" name="notes" rows="3"></textarea>
+                        </div>
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">Service Details:</h6>
+                            <p class="mb-0">Price: ${{ "%.2f"|format(service.price) }}</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not services %}
+<div class="text-center py-5">
+    <i class="bi bi-inbox fs-1 text-muted"></i>
+    <p class="mt-2">No services available at the moment</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('searchService').addEventListener('input', filterServices);
+document.getElementById('categoryFilter').addEventListener('change', filterServices);
+
+function filterServices() {
+    const searchText = document.getElementById('searchService').value.toLowerCase();
+    const category = document.getElementById('categoryFilter').value.toLowerCase();
+    const services = document.querySelectorAll('#servicesGrid > div');
+    
+    services.forEach(service => {
+        const text = service.textContent.toLowerCase();
+        const serviceCategory = service.dataset.category;
+        const matchesSearch = text.includes(searchText);
+        const matchesCategory = !category || serviceCategory === category;
+        
+        service.style.display = matchesSearch && matchesCategory ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

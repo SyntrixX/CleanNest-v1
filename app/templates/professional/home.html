@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Professional Dashboard - Household Services{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2>Professional Dashboard</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Pending Requests</h5>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <h3 class="mb-0">{{ pending_requests|length }}</h3>
+                        <p class="text-muted mb-0">New Requests</p>
+                    </div>
+                    <i class="bi bi-clock-history fs-1 text-warning"></i>
+                </div>
+                <a href="{{ url_for('professional.requests', status='pending') }}" 
+                   class="btn btn-outline-warning mt-3">View Pending</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Active Jobs</h5>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <h3 class="mb-0">{{ active_requests|length }}</h3>
+                        <p class="text-muted mb-0">In Progress</p>
+                    </div>
+                    <i class="bi bi-gear-fill fs-1 text-primary"></i>
+                </div>
+                <a href="{{ url_for('professional.requests', status='active') }}" 
+                   class="btn btn-outline-primary mt-3">View Active</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Completed Jobs</h5>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <h3 class="mb-0">{{ completed_requests|length }}</h3>
+                        <p class="text-muted mb-0">Total Completed</p>
+                    </div>
+                    <i class="bi bi-check-circle fs-1 text-success"></i>
+                </div>
+                <a href="{{ url_for('professional.requests', status='completed') }}" 
+                   class="btn btn-outline-success mt-3">View History</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Service Requests</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in recent_requests %}
+                            <tr>
+                                <td>{{ request.service.name }}</td>
+                                <td>{{ request.customer.name }}</td>
+                                <td>{{ request.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ request.status|status_color }}">
+                                        {{ request.status|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('professional.request_detail', request_id=request.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Performance Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="mb-2">Overall Rating</h6>
+                    <div class="d-flex align-items-center">
+                        <div class="display-4 me-2">{{ "%.1f"|format(rating_avg) }}</div>
+                        <div class="text-warning">
+                            {% for _ in range(rating_avg|int) %}
+                            <i class="bi bi-star-fill"></i>
+                            {% endfor %}
+                            {% if rating_avg % 1 >= 0.5 %}
+                            <i class="bi bi-star-half"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <small class="text-muted">Based on {{ total_ratings }} reviews</small>
+                </div>
+                <div>
+                    <h6 class="mb-2">Completion Rate</h6>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ completion_rate }}%" 
+                             aria-valuenow="{{ completion_rate }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            {{ completion_rate }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">Last 30 days</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

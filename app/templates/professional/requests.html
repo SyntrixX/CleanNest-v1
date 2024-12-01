@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Service Requests - Household Services{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Service Requests</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('professional.requests', status='pending') }}" 
+           class="btn btn-outline-primary {{ 'active' if status == 'pending' }}">Pending</a>
+        <a href="{{ url_for('professional.requests', status='active') }}" 
+           class="btn btn-outline-primary {{ 'active' if status == 'active' }}">Active</a>
+        <a href="{{ url_for('professional.requests', status='completed') }}" 
+           class="btn btn-outline-primary {{ 'active' if status == 'completed' }}">Completed</a>
+    </div>
+</div>
+
+<div class="row">
+    {% for request in requests %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="card-title mb-1">{{ request.service.name }}</h5>
+                        <span class="badge bg-{{ request.status|status_color }}">{{ request.status|title }}</span>
+                    </div>
+                    <div class="text-end">
+                        <p class="text-muted mb-1">Request #{{ request.id }}</p>
+                        <small class="text-muted">{{ request.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>Customer Details</h6>
+                    <p class="mb-1"><i class="bi bi-person"></i> {{ request.customer.name }}</p>
+                    <p class="mb-1"><i class="bi bi-geo-alt"></i> {{ request.customer.address }}</p>
+                    <p class="mb-0"><i class="bi bi-telephone"></i> {{ request.customer.phone }}</p>
+                </div>
+
+                {% if request.status == 'pending' %}
+                <div class="d-flex gap-2">
+                    <form action="{{ url_for('professional.accept_request', request_id=request.id) }}" method="POST">
+                        <button type="submit" class="btn btn-success">Accept</button>
+                    </form>
+                    <form action="{{ url_for('professional.reject_request', request_id=request.id) }}" method="POST">
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </form>
+                </div>
+                {% elif request.status == 'active' %}
+                <form action="{{ url_for('professional.complete_request', request_id=request.id) }}" method="POST">
+                    <button type="submit" class="btn btn-primary">Mark as Completed</button>
+                </form>
+                {% elif request.status == 'completed' and request.rating %}
+                <div>
+                    <h6>Customer Feedback</h6>
+                    <div class="text-warning mb-1">
+                        {% for _ in range(request.rating) %}
+                        <i class="bi bi-star-fill"></i>
+                        {% endfor %}
+                    </div>
+                    {% if request.feedback %}
+                    <p class="mb-0"><em>"{{ request.feedback }}"</em></p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not requests %}
+<div class="text-center py-5">
+    <i class="bi bi-inbox fs-1 text-muted"></i>
+    <p class="mt-2">No {{ status }} requests found</p>
+</div>
+{% endif %}
+{% endblock %}
