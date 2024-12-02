@@ -61,6 +61,11 @@ class ServiceRequest(db.Model):
     rating = db.Column(db.Integer)
     feedback = db.Column(db.Text)
 
+class Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('admin', uselist=False))
+
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
